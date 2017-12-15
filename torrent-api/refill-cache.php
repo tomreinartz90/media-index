@@ -2,7 +2,7 @@
 /**
  * Simple class to get the latest information from the movie app and store this in a json file that can be used at a later stage.
  */
-require_once "./RestApi.php";
+require_once "../RestApi.php";
 
 $rest = new RestApi();
 $baseUrl = "https://torrentapi.org/pubapi_v2.php";
