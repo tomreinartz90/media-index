@@ -37,6 +37,7 @@ class RestApi
         if ($result === false) {
             echo("==================================\n");
             echo 'Curl error: ' . curl_error($curl) . "\n";
+            echo 'Curl url: ' . $url . "\n";
             echo($url . "\n");
             echo("==================================\n");
         }
