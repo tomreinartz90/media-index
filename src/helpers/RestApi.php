@@ -11,7 +11,7 @@ class RestApi
     private function CallAPI($method, $url, $data = false)
     {
         $curl = curl_init();
-
+        $result = false;
 
         switch ($method) {
             case "POST":
