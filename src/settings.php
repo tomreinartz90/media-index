@@ -1,6 +1,8 @@
 <?php
 date_default_timezone_set("UTC");
 ini_set('user_agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:7.0.1) Gecko/20100101 Firefox/7.0.1');
+ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+
 return [
     'settings' => [
         'displayErrorDetails' => true, // set to false in production

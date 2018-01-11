@@ -2,6 +2,7 @@
 
 
 require __DIR__ . "/moviedb.php";
+require __DIR__ . "/../helpers/CacheUtil.php";
 
 /**
  * Created by PhpStorm.
@@ -19,6 +20,7 @@ class ListService
     public function __construct()
     {
         $this->movieDb = new Moviedb();
+        $this->cache = new CacheUtil(__DIR__ . "/../../cache/lists/");
         $this->rest = $this->movieDb->rest;
         $this->torrentapiUrl = "https://torrentapi.org/pubapi_v2.php";
         $this->torrentapiToken = null;
@@ -29,27 +31,27 @@ class ListService
         if ($this->torrentapiToken == null) {
             $token = json_decode($this->rest->get("$this->torrentapiUrl?get_token=get_token"), true);
             $this->torrentapiToken = $token['token'];
-//            sleep(2);
         }
         return $this->torrentapiToken;
     }
 
     public function getPopularUndergroundMovies($useCache = true)
     {
-        $tokenKey = $this->getTorrentApiToken();
-        $data = $this->rest->get("$this->torrentapiUrl?category=movies&append_to_response=videos,similar&format=json_extended&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey");
-        return [
-            'token' => $tokenKey,
-            'data' => json_decode($data)
-        ];
-        /*$data = json_decode());
-        if (empty(json_decode($data, true)['error'])) {
-            file_put_contents('./popular-movies.json', $data);
-        } else {
-            sleep(2);
-            return $this->getPopularUndergroundMovies($useCache);
+        $cacheKey = "popular_underground";
+        if (!$this->cache->has($cacheKey) || $useCache === false) {
+            $tokenKey = $this->getTorrentApiToken();
+            $data = $this->rest->get("$this->torrentapiUrl?category=movies&append_to_response=videos,similar&format=json_extended&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey");
+            $ids = $this->getMovieDbIds(json_decode($data, true));
+            $movies = $this->movieDb->getMovieDetailsByIds($ids);
+            if (sizeof($movies) > 0) {
+                $this->cache->set($cacheKey, $movies);
+                return $movies;
+            }
+            return false;
         }
-        return $data;*/
+
+        return $this->cache->get($cacheKey);
+
     }
 
     public function getRecentUndergroundMovies($useCache = true)
@@ -57,6 +59,7 @@ class ListService
         $tokenKey = $this->getTorrentApiToken();
         $data = json_decode($this->rest->get("$this->torrentapiUrl?category=movies&append_to_response=videos,similar&format=json_extended&mode=list&sort=last&limit=100&page=1&token=$tokenKey"));
     }
+
 
     public function getRecentUndergroundSeries($useCache = true)
     {
@@ -70,6 +73,20 @@ class ListService
     {
         $tokenKey = $this->getTorrentApiToken();
         $data = $this->rest->get("$this->torrentapiUrl?category=movies&append_to_response=videos,similar&format=json_extended&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey");
+    }
+
+    private function getMovieDbIds($data)
+    {
+        $result = [];
+        if (isset($data) && isset($data['torrent_results'])) {
+            foreach ($data['torrent_results'] as $row) {
+                array_push($result, $row['episode_info']['themoviedb']);
+            }
+            return array_values(array_unique($result));
+        } else {
+            return false;
+        }
+
     }
 
 }
