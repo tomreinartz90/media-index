@@ -1,64 +1,69 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: t.reinartz
- * Date: 29-11-2017
- * Time: 13:19
- */
-class RestApi
-{
-    private function CallAPI($method, $url, $data = false)
+  /**
+   * Created by PhpStorm.
+   * User: t.reinartz
+   * Date: 29-11-2017
+   * Time: 13:19
+   */
+  class RestApi
+  {
+    private function CallAPI( $method, $url, $data = false )
     {
-        $curl = curl_init();
-        $result = false;
+      $curl = curl_init();
+      $result = false;
 
-        switch ($method) {
-            case "POST":
-            case "PUT":
-                if ($data) {
-                    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: ' . strlen($data)));
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-                }
-                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                break;
-            default:
-                break;
-        }
+      switch ( $method ) {
+        case "POST":
+        case "PUT":
+          if ( $data ) {
+            curl_setopt( $curl, CURLOPT_HTTPHEADER, [ 'Content-Type: application/json', 'Content-Length: ' . strlen( $data ) ] );
+            curl_setopt( $curl, CURLOPT_POSTFIELDS, $data );
+          }
+          curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $method );
+          curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+          break;
+        default:
+          break;
+      }
 
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+      curl_setopt( $curl, CURLOPT_URL, $url );
+      curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
+      curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
+      curl_setopt( $curl, CURLOPT_TIMEOUT, 10 );
 
-        $result = curl_exec($curl);
+      $result = curl_exec( $curl );
 
 
-        if ($result === false) {
-            echo("==================================\n");
-            echo 'Curl error: ' . curl_error($curl) . "\n";
-            echo 'Curl url: ' . $url . "\n";
-            echo($url . "\n");
-            echo("==================================\n");
-        }
+      if ( $result === false ) {
+        echo( "==================================\n" );
+        echo 'Curl error: ' . curl_error( $curl ) . "\n";
+        echo 'Curl url: ' . $url . "\n";
+        echo( $url . "\n" );
+        echo( "==================================\n" );
+      }
 
-        curl_close($curl);
-        return $result;
+      curl_close( $curl );
+      return $result;
     }
 
-    function get($url)
+    function get( $url )
     {
-        return $this->CallAPI('GET', $url);
+      return $this -> CallAPI( 'GET', $url );
     }
 
-    function put($url, $data)
+    function getJson( $url )
     {
-        return $this->CallAPI('PUT', $url, $data);
+      return json_decode( $this -> get( $url ), true );
     }
 
-    function post($url, $data)
+    function put( $url, $data )
     {
-        return $this->CallAPI('POST', $url, $data);
+      return $this -> CallAPI( 'PUT', $url, $data );
     }
-}
+
+    function post( $url, $data )
+    {
+      return $this -> CallAPI( 'POST', $url, $data );
+    }
+  }

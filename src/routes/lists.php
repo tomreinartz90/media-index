@@ -1,33 +1,44 @@
 <?php
 
-/**
- * /lists/{name} get details about a specific id
- * ?useCache=false to force reload details.
- */
-$app->get('/lists/{group}[/{name}]', function ($request, $response, $args) {
+  /**
+   * /lists/{name} get details about a specific id
+   * ?useCache=false to force reload details.
+   */
+  $app -> get( '/', function ( $request, $response, $args ) {
+    require __DIR__ . '/../services/lists.php';
+    $service = new ListService();
+    $data = $service -> getPopularUndergroundMovies();
+    $newResp = $response -> withJson( $data );
+    return $newResp;
+
+  } );
+
+  $app -> get( '/lists/{group}[/{name}]', function ( $request, $response, $args ) {
     require __DIR__ . '/../services/lists.php';
 
     $data = null;
     $service = new ListService();
-    $useCache = $request->getQueryParams('useCache', true);
-
-    $newResp = $response->withJson(['error' => "Could not get list details"], 404);
+    $useCache = $request -> getQueryParam( 'useCache' ) !== "false";
+    $newResp = $response -> withJson( [ 'error' => "Could not get list details" ], 404 );
     $data = null;
-    if ($args['group'] == 'movies') {
-//        var_dump($args);
-        switch ($args['name']) {
-            case 'popular-underground':
-                $data = $service->getPopularUndergroundMovies($useCache);
-                break;
-            case 'recent-underground':
-                $data = $service->getPopularUndergroundMovies($useCache);
-                break;
-        }
+    switch ( $args[ 'group' ] . '-' . $args[ 'name' ] ) {
+      case 'movies-popular-underground':
+        $data = $service -> getPopularUndergroundMovies( $useCache );
+        break;
+      case 'movies-recent-underground':
+        $data = $service -> getRecentUndergroundMovies( $useCache );
+        break;
+      case 'series-recent-underground':
+        $data = $service -> getRecentUndergroundSeries( $useCache );
+        break;
+      case 'series-popular-underground':
+        $data = $service -> getRecentUndergroundSeries( $useCache );
+        break;
     }
 
-    if ($data != null) {
-        $newResp = $response->withJson($data);
+    if ( $data != null ) {
+      $newResp = $response -> withJson( $data );
     }
 
     return $newResp;
-});
+  } );

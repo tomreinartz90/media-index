@@ -1,0 +1,32 @@
+- lists
+-- top rated movies
+-- recently released movies
+-- just aired tv-shows
+-- new tv-shows 
+-- etc..
+
+- shows
+-- index shows
+--- Primary info
+--- Seasons
+---- Primary info
+---- Trailers
+--- Episodes
+---- Primary info 
+
+- movies
+-- index movies
+--- Primary info
+#--- Alternative titles
+#--- Cast
+#--- Crew
+--- Images (posters, backdrops)
+#--- Plot keywords
+#--- Release information
+--- Trailers
+#--- Translations
+#--- Similiar movies
+#--- Reviews
+#--- Belongs to lists
+- people
+-- index people

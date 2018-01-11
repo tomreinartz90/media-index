@@ -10,7 +10,7 @@
 
     $data = null;
     $movieDb = new Moviedb();
-    $useCache = $request -> getQueryParams( 'useCache', true );
+    $useCache = $request -> getQueryParam( 'useCache' ) !== "false";
 
     if ( isset( $args[ 'id' ] ) ) {
       $data = $movieDb -> getMovieDetails( $args[ 'id' ], $useCache );

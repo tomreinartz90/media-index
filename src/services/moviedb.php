@@ -2,6 +2,8 @@
 
 
   require __DIR__ . "/../helpers/RestApi.php";
+  require_once __DIR__ . "/../helpers/CacheUtil.php";
+  require_once __DIR__ . "/../domain/Movie.php";
 
   /**
    * Created by PhpStorm.
@@ -21,23 +23,23 @@
     public function __construct()
     {
       $this -> rest = new RestApi();
+      $this -> cache = new CacheUtil( __DIR__ . "/../../cache/movies/" );
     }
 
     public function getMovies( $page = 1 )
     {
-      return $this -> rest -> get( $this -> baseUrl . "discover/movie?page=$page&with_original_language=en" . $this -> apiKey );
+      return $this -> rest -> getJson( $this -> baseUrl . "discover/movie?page=$page&with_original_language=en" . $this -> apiKey );
     }
 
     public function getMovieDetails( $movieId, $useCache = true )
     {
-      $filename = __DIR__ . "/../../cache/movies/$movieId.json";
 
-      if ( !file_exists( $filename ) || $useCache === false ) {
-        $movieDetails = json_decode( $this -> rest -> get( $this -> baseUrl . "movie/$movieId?append_to_response=videos,recommendations" . $this -> apiKey ), true );
+      if ( !$this -> cache -> has( $movieId ) || $useCache === false ) {
+        $movieDetails = $this -> rest -> getJson( $this -> baseUrl . "movie/$movieId?append_to_response=videos,recommendations" . $this -> apiKey );
         //check if we successfully got the data from the api
         if ( isset( $movieDetails[ 'id' ] ) ) {
-          file_put_contents( $filename, json_encode( $movieDetails ) );
-          return $movieDetails;
+          $this -> cache -> set( $movieId, $movieDetails );
+          return new Movie( $movieDetails );
         } else if ( $movieDetails[ 'status_code' ] == 34 ) {
           return false;
           //else we will wait a bit and return the data
@@ -46,14 +48,17 @@
           return $this -> getMovieDetails( $movieId );
         }
       }
-      return json_decode( file_get_contents( $filename ), true );
+      return new Movie( $this -> cache -> get( $movieId ) );
     }
 
     function getMovieDetailsByIds( $movieIds )
     {
       $result = [];
       foreach ( $movieIds as $movieId ) {
-        array_push( $result, $this -> getMovieDetails( $movieId ) );
+        $data = $this -> getMovieDetails( $movieId );
+        if ( $data != false ) {
+          array_push( $result, $data );
+        }
       }
       return $result;
     }
@@ -61,7 +66,7 @@
 
     function buildMovieCache( $page = 1, $remoteUrl, $useCache = true )
     {
-      $moviesSet = json_decode( $this -> getMovies( $page ), true );
+      $moviesSet = $this -> getMovies( $page );
       $movies = $moviesSet[ 'results' ];
 
       //get details for every movie
@@ -124,6 +129,20 @@
       }
 
       return $image;
+    }
+
+    public function toSimpleMovieObjs( $movieObjs )
+    {
+      if ( $movieObjs AND sizeof( $movieObjs ) > 0 ) {
+        $mapper = function ( $movie ) {
+          if ( $movie && $movie instanceof Movie ) {
+            return $movie -> getSimple();
+          }
+          return false;
+        };
+
+        return array_map( $mapper, $movieObjs );
+      }
     }
 
   }
