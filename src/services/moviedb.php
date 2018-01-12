@@ -4,6 +4,7 @@
   require __DIR__ . "/../helpers/RestApi.php";
   require_once __DIR__ . "/../helpers/CacheUtil.php";
   require_once __DIR__ . "/../domain/Movie.php";
+  require_once __DIR__ . "/../domain/Serie.php";
 
   /**
    * Created by PhpStorm.
@@ -23,7 +24,8 @@
     public function __construct()
     {
       $this -> rest = new RestApi();
-      $this -> cache = new CacheUtil( __DIR__ . "/../../cache/movies/" );
+      $this -> movieCache = new CacheUtil( __DIR__ . "/../../cache/movies/" );
+      $this -> seriesCache = new CacheUtil( __DIR__ . "/../../cache/series/" );
     }
 
     public function getMovies( $page = 1 )
@@ -33,22 +35,20 @@
 
     public function getMovieDetails( $movieId, $useCache = true )
     {
-
-      if ( !$this -> cache -> has( $movieId ) || $useCache === false ) {
-        $movieDetails = $this -> rest -> getJson( $this -> baseUrl . "movie/$movieId?append_to_response=videos,recommendations" . $this -> apiKey );
+      $getData = function () use ( $movieId ) {
+        $details = $this -> rest -> getJson( $this -> baseUrl . "movie/$movieId?append_to_response=videos,recommendations" . $this -> apiKey );
         //check if we successfully got the data from the api
-        if ( isset( $movieDetails[ 'id' ] ) ) {
-          $this -> cache -> set( $movieId, $movieDetails );
-          return new Movie( $movieDetails );
-        } else if ( $movieDetails[ 'status_code' ] == 34 ) {
-          return false;
-          //else we will wait a bit and return the data
-        } else {
-          sleep( 5 );
-          return $this -> getMovieDetails( $movieId );
+        if ( isset( $details[ 'id' ] ) ) {
+          return $details;
         }
-      }
-      return new Movie( $this -> cache -> get( $movieId ) );
+        return false;
+        //else we will wait a bit and return the data
+      };
+
+      $data = $this -> seriesCache -> getOrSetData( $movieId, $useCache, $getData );
+
+      return new Movie( $data );
+
     }
 
     function getMovieDetailsByIds( $movieIds )
@@ -56,6 +56,36 @@
       $result = [];
       foreach ( $movieIds as $movieId ) {
         $data = $this -> getMovieDetails( $movieId );
+        if ( $data != false ) {
+          array_push( $result, $data );
+        }
+      }
+      return $result;
+    }
+
+    public function getSerieDetails( $serieId, $useCache = true )
+    {
+
+      $getData = function () use ( $serieId ) {
+        $details = $this -> rest -> getJson( $this -> baseUrl . "tv/$serieId?append_to_response=videos,recommendations" . $this -> apiKey );
+        //check if we successfully got the data from the api
+        if ( isset( $details[ 'id' ] ) ) {
+          return $details;
+        }
+        return false;
+        //else we will wait a bit and return the data
+      };
+
+      $data = $this -> seriesCache -> getOrSetData( $serieId, $useCache, $getData );
+
+      return new Serie( $data );
+    }
+
+    function getSerieDetailsByIds( $serieIds )
+    {
+      $result = [];
+      foreach ( $serieIds as $id ) {
+        $data = $this -> getSerieDetails( $id );
         if ( $data != false ) {
           array_push( $result, $data );
         }
@@ -143,6 +173,20 @@
 
         return array_map( $mapper, $movieObjs );
       }
+    }
+
+    /**
+     * @param $sort | vote_average.desc, vote_average.asc, first_air_date.desc, first_air_date.asc, popularity.desc, popularity.asc
+     * @return mixed
+     *
+     */
+    public function discoverSeries( $sort = "popularity.asc", $page = 1 )
+    {
+      $data = $this -> rest -> getJson( "https://api.themoviedb.org/3/discover/tv?api_key=$this->apiKey&sort_by=$sort&page=$page" );
+      if ( isset( $data[ 'results' ] ) ) {
+        return $data;
+      }
+      return false;
     }
 
   }

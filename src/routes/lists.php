@@ -28,11 +28,11 @@
       case 'movies-recent-underground':
         $data = $service -> getRecentUndergroundMovies( $useCache );
         break;
-      case 'series-recent-underground':
-        $data = $service -> getRecentUndergroundSeries( $useCache );
+      case 'series-new':
+        $data = $service -> getNewSeries( $useCache );
         break;
-      case 'series-popular-underground':
-        $data = $service -> getRecentUndergroundSeries( $useCache );
+      case 'series-popular':
+        $data = $service -> getPopularSeries( $useCache );
         break;
     }
 

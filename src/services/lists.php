@@ -37,82 +37,60 @@
 
     public function getPopularUndergroundMovies( $useCache = true )
     {
-      $cacheKey = "popular_underground_movies";
-      if ( !$this -> cache -> has( $cacheKey ) || $useCache === false ) {
+      $getData = function () {
         $tokenKey = $this -> getTorrentApiToken();
-        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=movies&append_to_response=videos,similar&format=json_extended&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey" );
+        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=movies&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey" );
         $ids = $this -> getMovieDbIds( $data );
         $movies = $this -> movieDb -> toSimpleMovieObjs( $this -> movieDb -> getMovieDetailsByIds( $ids ) );
         if ( sizeof( $movies ) > 0 ) {
-          $this -> cache -> set( $cacheKey, $movies );
           return $movies;
         }
         return false;
-      }
+      };
 
-      return $this -> cache -> get( $cacheKey );
+      return $this -> cache -> getOrSetData( "popular_underground_movies", $useCache, $getData );
 
     }
 
     public function getRecentUndergroundMovies( $useCache = true )
     {
-      $cacheKey = "recent_underground_movies";
-      if ( !$this -> cache -> has( $cacheKey ) || $useCache === false ) {
+
+      $getData = function () {
         $tokenKey = $this -> getTorrentApiToken();
-        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=movies&append_to_response=videos,similar&format=json_extended&mode=list&sort=last&limit=100&page=1&token=$tokenKey" );
+        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=movies&mode=list&sort=last&limit=100&page=1&token=$tokenKey" );
         $ids = $this -> getMovieDbIds( $data );
         $movies = $this -> movieDb -> toSimpleMovieObjs( $this -> movieDb -> getMovieDetailsByIds( $ids ) );
         if ( sizeof( $movies ) > 0 ) {
-          $this -> cache -> set( $cacheKey, $movies );
           return $movies;
         }
         return false;
-      }
+      };
 
-      return $this -> cache -> get( $cacheKey );
+      return $this -> cache -> getOrSetData( "recent_underground_movies", $useCache, $getData );
 
     }
 
 
-    public function getRecentUndergroundSeries( $useCache = true )
+    public function getNewSeries( $useCache )
     {
+      $getData = function () {
+        return $this -> movieDb -> discoverSeries( "first_air_date.desc" )[ 'results' ];
+      };
 
-      $cacheKey = "recent_underground_movies";
-      if ( !$this -> cache -> has( $cacheKey ) || $useCache === false ) {
-        $tokenKey = $this -> getTorrentApiToken();
-        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=tv&append_to_response=videos,similar&format=json_extended&mode=list&sort=last&limit=100&page=1&token=$tokenKey" );
-        $ids = $this -> getMovieDbIds( $data );
-        $movies = $this -> movieDb -> getMovieDetailsByIds( $ids );
-        if ( sizeof( $movies ) > 0 ) {
-          $this -> cache -> set( $cacheKey, $movies );
-          return $movies;
-        }
-        return false;
-      }
+      return $this -> cache -> getOrSetData( "new_series", $useCache, $getData );
 
-      return $this -> cache -> get( $cacheKey );
 
     }
 
-    public function getPopularUndergroundSeries( $useCache = true )
+    public function getPopularSeries( $useCache )
     {
+      $getData = function () {
+        return $this -> movieDb -> discoverSeries( "popularity.desc" )[ 'results' ];
+      };
 
-      $cacheKey = "recent_underground_movies";
-      if ( !$this -> cache -> has( $cacheKey ) || $useCache === false ) {
-        $tokenKey = $this -> getTorrentApiToken();
-        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=tv&append_to_response=videos,similar&format=json_extended&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey" );
-        $ids = $this -> getMovieDbIds( $data );
-        $movies = $this -> movieDb -> getMovieDetailsByIds( $ids );
-
-        if ( sizeof( $movies ) > 0 ) {
-          $this -> cache -> set( $cacheKey, $movies );
-          return $movies;
-        }
-        return false;
-      }
-
-      return $this -> cache -> get( $cacheKey );
+      return $this -> cache -> getOrSetData( "popular_series", $useCache, $getData );
     }
+
 
     private function getMovieDbIds( $data )
     {
