@@ -1,7 +1,7 @@
 <?php
 
 
-require __DIR__ . "/moviedb.php";
+require_once __DIR__ . "/moviedb.php";
 require_once __DIR__ . "/../helpers/CacheUtil.php";
 
 /**

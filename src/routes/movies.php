@@ -6,7 +6,7 @@
    * ?useCache=false to force reload details about the movie.
    */
   $app -> get( '/movies[/{id}]', function ( $request, $response, $args ) {
-    require __DIR__ . '/../services/moviedb.php';
+    require_once __DIR__ . '/../services/moviedb.php';
 
     $data = null;
     $movieDb = new Moviedb();

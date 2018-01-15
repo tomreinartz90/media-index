@@ -1,7 +1,7 @@
 <?php
 
 
-  require __DIR__ . "/../helpers/RestApi.php";
+  require_once __DIR__ . "/../helpers/RestApi.php";
   require_once __DIR__ . "/../helpers/CacheUtil.php";
   require_once __DIR__ . "/../domain/Movie.php";
   require_once __DIR__ . "/../domain/Serie.php";
