@@ -8,14 +8,14 @@
    */
 
   // Function to remove folders and files
-  function rrmdir($dir) {
-    if (is_dir($dir)) {
-      $files = scandir($dir);
-      foreach ($files as $file)
-        if ($file != "." && $file != "..") rrmdir("$dir/$file");
-      rmdir($dir);
-    }
-    else if (file_exists($dir)) unlink($dir);
+  function rrmdir( $dir )
+  {
+    if ( is_dir( $dir ) ) {
+      $files = scandir( $dir );
+      foreach ( $files as $file )
+        if ( $file != "." && $file != ".." ) rrmdir( "$dir/$file" );
+      rmdir( $dir );
+    } else if ( file_exists( $dir ) ) unlink( $dir );
   }
 
   $ch = curl_init();
@@ -55,11 +55,14 @@
   }
 
   echo "start move of files from src folder\n";
-  //move updated files to root
   $oldfolderpath = __DIR__ . "/media-index-master/src";
   $newfolderpath = __DIR__ . "/src";
 
+  //remove existing files from dest folder
   if ( file_exists( $newfolderpath ) )
     rrmdir( $newfolderpath );
+
+
+  //move updated files to root
   rename( $oldfolderpath, $newfolderpath );
   echo "all done\n";
