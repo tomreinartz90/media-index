@@ -7,6 +7,11 @@
    * Time: 20:50
    */
 
+  if ( strpos( $_SERVER[ 'HTTP_USER_AGENT' ], 'GitHub-Hookshot' ) === false ) {
+    die( 'access denied' );
+  }
+
+
   // Function to remove folders and files
   function rrmdir( $dir )
   {
@@ -17,6 +22,7 @@
       rmdir( $dir );
     } else if ( file_exists( $dir ) ) unlink( $dir );
   }
+
 
   $ch = curl_init();
   $source = "https://github.com/tomreinartz90/media-index/archive/master.zip"; // THE FILE URL
