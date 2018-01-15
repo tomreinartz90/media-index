@@ -56,7 +56,7 @@
       $result = [];
       foreach ( $movieIds as $movieId ) {
         $data = $this -> getMovieDetails( $movieId );
-        if ( $data != false ) {
+        if ( $data != false && $data->id != 0) {
           array_push( $result, $data );
         }
       }
