@@ -1,43 +1,47 @@
 <?php
 
-  /**
-   * Created by PhpStorm.
-   * User: t.reinartz
-   * Date: 11-1-2018
-   * Time: 12:35
-   */
-  class CacheUtil
-  {
+/**
+ * Created by PhpStorm.
+ * User: t.reinartz
+ * Date: 11-1-2018
+ * Time: 12:35
+ */
+class CacheUtil
+{
 
     /**
      * CacheUtil constructor.
      */
-    public function __construct( $cachePath )
+    public function __construct($cachePath)
     {
-      if ( isset( $cachePath ) ) {
-        $this -> cachePath = $cachePath;
-        if ( !file_exists( $cachePath ) ) {
-          die( "$cachePath does not exist or is not writeable." );
+        if (isset($cachePath)) {
+            $this->cachePath = $cachePath;
+            if (!file_exists($cachePath)) {
+                die("$cachePath does not exist or is not writeable.");
+            }
+        } else {
+            die("Cannot create CacheUtil without CachePath");
         }
-      } else {
-        die( "Cannot create CacheUtil without CachePath" );
-      }
     }
 
-    public function get( $key )
+    public function get($key)
     {
-      $data = file_get_contents( $this -> cachePath . '/' . $key );
-      return $data !== false ? json_decode( $data ) : $data;
+        if ($this->has($key)) {
+
+            $data = file_get_contents($this->cachePath . '/' . $key);
+            return $data !== false ? json_decode($data) : $data;
+        }
+        return false;
     }
 
-    public function set( $key, $data )
+    public function set($key, $data)
     {
-      return file_put_contents( $this -> cachePath . '/' . $key, json_encode( $data ) );
+        return file_put_contents($this->cachePath . '/' . $key, json_encode($data));
     }
 
-    public function has( $key )
+    public function has($key)
     {
-      return file_exists( $this -> cachePath . '/' . $key );
+        return file_exists($this->cachePath . '/' . $key);
     }
 
     /**
@@ -47,22 +51,22 @@
      * @param $getData
      * @return bool|mixed|string
      */
-    public function getOrSetData( $cacheKey, $useCache, $getData )
+    public function getOrSetData($cacheKey, $useCache, $getData)
     {
-      $retries = 0;
-      if ( !$this -> has( $cacheKey ) || $useCache === false ) {
-        $data = $getData();
-        if ( isset( $data ) && $data != false ) {
-          $this -> set( $cacheKey, $data );
-          return $data;
-        } else if ( $retries < 4 ) {
-          sleep( 3 );
-          $getData();
+        $retries = 0;
+        if (!$this->has($cacheKey) || $useCache === false) {
+            $data = $getData();
+            if (isset($data) && $data != false) {
+                $this->set($cacheKey, $data);
+                return $data;
+            } else if ($retries < 4) {
+                sleep(3);
+                $getData();
+            }
         }
-      }
 
-      return $this -> get( $cacheKey );
+        return $this->get($cacheKey);
 
 
     }
-  }
+}

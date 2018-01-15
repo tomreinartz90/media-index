@@ -45,7 +45,7 @@
         //else we will wait a bit and return the data
       };
 
-      $data = $this -> seriesCache -> getOrSetData( $movieId, $useCache, $getData );
+      $data = $this -> movieCache -> getOrSetData( $movieId, $useCache, $getData );
 
       return new Movie( $data );
 

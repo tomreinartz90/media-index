@@ -1,13 +1,13 @@
 <?php
 
-  /**
-   * Created by PhpStorm.
-   * User: taren
-   * Date: 11-1-2018
-   * Time: 22:05
-   */
-  class Movie
-  {
+/**
+ * Created by PhpStorm.
+ * User: taren
+ * Date: 11-1-2018
+ * Time: 22:05
+ */
+class Movie
+{
     public $adult; //boolean
     public $backdrop_path; //String
     public $belongs_to_collection; //BelongsToCollection
@@ -36,23 +36,25 @@
     public $videos; //Videos
     public $recommendations; //Recommendations
 
-    function __construct( $data = [] )
+    function __construct($data = [])
     {
-      foreach ( $data as $key => $value ) {
-        $this -> $key = $value;
-      }
+        if (isset($data)) {
+            foreach ($data as $key => $value) {
+                $this->$key = $value;
+            }
+        }
     }
 
     public function getSimple()
     {
-      return [
-        'id'            => $this -> id,
-        'title'         => $this -> title,
-        'vote_average'  => $this -> vote_average,
-        'release_date'  => $this -> release_date,
-        'genres'        => $this -> genres,
-        'poster_path'   => $this -> poster_path,
-        'backdrop_path' => $this -> backdrop_path,
-      ];
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'vote_average' => $this->vote_average,
+            'release_date' => $this->release_date,
+            'genres' => $this->genres,
+            'poster_path' => $this->poster_path,
+            'backdrop_path' => $this->backdrop_path,
+        ];
     }
-  }
+}
