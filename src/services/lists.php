@@ -97,7 +97,9 @@ class ListService
         $result = [];
         if (isset($data) && isset($data['torrent_results'])) {
             foreach ($data['torrent_results'] as $row) {
+              if(isset($row['episode_info']['themoviedb']) and $row['episode_info']['themoviedb'] != 0){
                 array_push($result, $row['episode_info']['themoviedb']);
+              }
             }
             return array_values(array_unique($result));
         } else {
