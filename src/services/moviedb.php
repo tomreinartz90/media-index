@@ -15,7 +15,7 @@
    */
   class Moviedb
   {
-    private $baseUrl = "http://api.themoviedb.org/3/";
+    private $baseUrl = "https://thuis.tomreinartz.com/themoviedb/3/";
     private $apiKey = "&api_key=ffbd2b663d53a66c2dd00bb517491490";
 
     /**
