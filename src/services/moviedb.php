@@ -44,9 +44,9 @@
         return false;
         //else we will wait a bit and return the data
       };
-
       $data = $this -> movieCache -> getOrSetData( $movieId, $useCache, $getData );
-
+//      var_dump( $data );
+//      return $data;
       return new Movie( $data );
 
     }
@@ -56,7 +56,7 @@
       $result = [];
       foreach ( $movieIds as $movieId ) {
         $data = $this -> getMovieDetails( $movieId );
-        if ( $data != false && $data->id != 0) {
+        if ( $data != false && $data -> id != 0 ) {
           array_push( $result, $data );
         }
       }

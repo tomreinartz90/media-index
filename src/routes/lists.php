@@ -34,7 +34,7 @@
 
 
   $app -> get( '/lists/{lists}', function ( $request, $response, $args ) use ( $getListInfo ) {
-    var_dump( json_decode( $request -> getQueryParam( 'ids', "[]" ) ) );
+//    var_dump( json_decode( $request -> getQueryParam( 'ids', "[]" ) ) );
     $listsString = $args[ 'lists' ];
     $listsString = str_replace( '[', '', $listsString );
     $listsString = str_replace( ']', '', $listsString );

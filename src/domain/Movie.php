@@ -40,11 +40,11 @@
     {
 
       try {
-        if ( isset( $data ) && isset( $data -> id ) ) {
-          foreach ( $data as $key => $value ) {
-            $this -> $key = $value;
-          }
+//        if ( isset( $data ) && isset( $data -> id ) ) {
+        foreach ( $data as $key => $value ) {
+          $this -> $key = $value;
         }
+//        }
       } catch ( Exception $err ) {
 //        var_dump( $err );
       }
