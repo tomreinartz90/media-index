@@ -18,6 +18,7 @@
 
       CacheManager ::setDefaultConfig( [
         "path" => __DIR__ . '/../../cache', // or in windows "C:/tmp/"
+         "defaultTtl" =>  "262974300"
       ] );
 //      $this -> cache = CacheManager ::getInstance( 'Sqlite' );
       $this -> cache = CacheManager ::getInstance( 'Files' );
