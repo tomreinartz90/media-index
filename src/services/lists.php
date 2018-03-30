@@ -30,8 +30,8 @@
     {
       if ( $this -> torrentapiToken == null ) {
         $token = $this -> rest -> getJson( "$this->torrentapiUrl&get_token=get_token" );
+        sleep(1);
         $this -> torrentapiToken = $token[ 'token' ];
-        return $token;
       }
       return $this -> torrentapiToken;
     }

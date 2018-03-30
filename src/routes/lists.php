@@ -54,7 +54,6 @@
   } );
 
   $app -> get( '/lists/{group}/{name}', function ( $request, $response, $args ) use ( $getListInfo ) {
-    require_once __DIR__ . '/../services/lists.php';
 
     $data = null;
     $useCache = $request -> getQueryParam( 'useCache' ) !== "false";
