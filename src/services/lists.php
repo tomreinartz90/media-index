@@ -22,15 +22,16 @@
       $this -> movieDb = new Moviedb();
       $this -> cache = new CacheUtil( __DIR__ . "/../../cache/lists/" );
       $this -> rest = $this -> movieDb -> rest;
-      $this -> torrentapiUrl = "https://torrentapi.org/pubapi_v2.php";
+      $this -> torrentapiUrl = "https://torrentapi.org/pubapi_v2.php?app_id=my_local_movie_app";
       $this -> torrentapiToken = null;
     }
 
     private function getTorrentApiToken()
     {
       if ( $this -> torrentapiToken == null ) {
-        $token = $this -> rest -> getJson( "$this->torrentapiUrl?get_token=get_token" );
+        $token = $this -> rest -> getJson( "$this->torrentapiUrl&get_token=get_token" );
         $this -> torrentapiToken = $token[ 'token' ];
+        return $token;
       }
       return $this -> torrentapiToken;
     }
@@ -39,14 +40,15 @@
     {
       $getData = function () {
         $tokenKey = $this -> getTorrentApiToken();
-        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=movies&format=json_extended&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey" );
+        $data = $this -> rest -> getJson( "$this->torrentapiUrl&category=movies&format=json_extended&mode=list&sort=seeders&limit=100&page=1&token=$tokenKey" );
         $ids = $this -> getMovieDbIds( $data );
         $movies = $this -> movieDb -> toSimpleMovieObjs( $this -> movieDb -> getMovieDetailsByIds( $ids ) );
         if ( sizeof( $movies ) > 0 ) {
           return $movies;
         } else {
+          return false;
         }
-        return false;
+
       };
 
       return $this -> cache -> getOrSetData( "popular_underground_movies", $useCache, $getData );
@@ -58,7 +60,7 @@
 
       $getData = function () {
         $tokenKey = $this -> getTorrentApiToken();
-        $data = $this -> rest -> getJson( "$this->torrentapiUrl?category=movies&format=json_extended&mode=list&sort=last&limit=100&page=1&token=$tokenKey" );
+        $data = $this -> rest -> getJson( "$this->torrentapiUrl&category=movies&format=json_extended&mode=list&sort=last&limit=100&page=1&token=$tokenKey" );
         $ids = $this -> getMovieDbIds( $data );
         $movies = $this -> movieDb -> toSimpleMovieObjs( $this -> movieDb -> getMovieDetailsByIds( $ids ) );
         if ( sizeof( $movies ) > 0 ) {

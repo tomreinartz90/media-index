@@ -11,7 +11,6 @@
     private function CallAPI( $method, $url, $data = false )
     {
       $curl = curl_init();
-      $result = false;
 
       switch ( $method ) {
         case "POST":
@@ -33,11 +32,10 @@
       curl_setopt( $curl, CURLOPT_TIMEOUT, 10 );
 
       $result = curl_exec( $curl );
-
-
-      if ( $result === false ) {
+      $error = curl_error($curl);
+      if ( $error != '' ) {
         echo( "==================================\n" );
-        echo 'Curl error: ' . curl_error( $curl ) . "\n";
+        echo 'Curl error: ' . $error . "\n";
         echo 'Curl url: ' . $url . "\n";
         echo( $url . "\n" );
         echo( "==================================\n" );
